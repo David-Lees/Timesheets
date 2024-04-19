@@ -1,0 +1,74 @@
+﻿@using Timesheets.Models
+@if (Item is not null)
+{
+    <tr>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass">@Item.Date.ToShortDateString()</td>
+        <td class="bordered fw-bold @CssClass">@Item.Date.ToString("ddd")</td>
+        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.Start1Text" /></td>
+        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.End1Text" /></td>
+        <td class="bordered @CssClass">@GetAmTotal()</td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.Start2Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.End2Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered @CssClass">@GetPmTotal()</td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass"><InputText type="text" @bind-Value="Item.Reason" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.OtherText" @bind-Value:after="TextChanged" /></td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass">@FormatTime(Item.DailyTotal)</td>
+        <td class="bordered @CssClass">@FormatTime(Item.CumulativeTotal)</td>
+        <td class="bordered @CssClass">@FormatTime(Item.ConditionedHours)</td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass">@FormatTime(Item.DailyTotal - Item.ConditionedHours)</td>
+        <td class="bordered @CssClass">@FormatTime(Item.CumulativeTotal)</td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="bordered @CssClass">@Item.DailyTotal.ToString("f2")</td>
+        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+    </tr>
+}
+
+@code {
+    [Parameter]
+    public DayRecord Item { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<DayRecord> ItemChanged { get; set; }
+
+    [Parameter]
+    public decimal PreviousTotal { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            return
+                (Item?.Date.DayOfWeek == DayOfWeek.Monday ? "heavy-top " : " ") +
+                (Item?.Date.DayOfWeek == DayOfWeek.Saturday ? "weekend " : " ") +
+                (Item?.Date.DayOfWeek == DayOfWeek.Sunday ? "heavy-bottom weekend" : "");
+        }
+    }
+
+    private decimal GetDecimal(TimeOnly time)
+    {
+        return time.Hour + ((decimal)time.Minute / 60);
+    }
+
+    private string FormatTime(decimal d) => $"{Math.Floor(d)}:{(int)((d % 1) * 100):d2}";
+
+    public void TextChanged()
+    {
+        Item ??= new();
+        Item.Start1 = TimeOnly.TryParse(Item.Start1Text, out TimeOnly s1) ? s1 : TimeOnly.MinValue;
+        Item.End1 = TimeOnly.TryParse(Item.End1Text, out TimeOnly e1) ? e1 : TimeOnly.MinValue;
+        Item.Start2 = TimeOnly.TryParse(Item.Start2Text, out TimeOnly s2) ? s2 : TimeOnly.MinValue;
+        Item.End2 = TimeOnly.TryParse(Item.End2Text, out TimeOnly e2) ? e2 : TimeOnly.MinValue;
+        Item.Other = TimeOnly.TryParse(Item.OtherText, out TimeOnly o) ? o : TimeOnly.MinValue;
+        Item.DailyTotal = ((GetDecimal(Item.End1) - GetDecimal(Item.Start1)) + (GetDecimal(Item.End2) - GetDecimal(Item.Start2)) + GetDecimal(Item.Other));
+        Item.CumulativeTotal = PreviousTotal + Item.DailyTotal;
+        ItemChanged.InvokeAsync(Item);
+    }
+
+    public string GetAmTotal() => Item is not null ? FormatTime(GetDecimal(Item.End1) - GetDecimal(Item.Start1)) : string.Empty;
+    public string GetPmTotal() => Item is not null ? FormatTime(GetDecimal(Item.End2) - GetDecimal(Item.Start2)) : string.Empty;
+}

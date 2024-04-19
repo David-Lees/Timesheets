@@ -1,0 +1,119 @@
+﻿@page "/timesheet"
+@using Timesheets.Models
+@using Timesheets.Shared
+
+<table class="table">
+    <tr class="tiny">
+        <td colspan="5">&nbsp;</td>
+        <td colspan="13" class="heavy-top heavy-left heavy-right shaded">&nbsp;</td>
+        <td colspan="5" class="heavy-top heavy-left heavy-right shaded">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="5" rowspan="3" class="heavy-bottom"><h3>Timesheet</h3></td>
+        <td class="shaded heavy-left">&nbsp;</td>
+        <td colspan="3" class="shaded fw-bold">Start Date</td>
+        <td class="heavy-left heavy-bottom heavy-right heavy-top"><InputText type="date" @bind-Value="DateText" /></td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="4" class="shaded fw-bold">Return for 4 week period ending</td>
+        <td class="shaded fw-bold">@Period.StartDate.AddDays(28).ToShortDateString()</td>
+        <td class="shaded heavy-right">&nbsp;</td>
+        <td class="shaded heavy-right" colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td colspan="6" rowspan="2" class="shaded fw-bold">Credit / Debit from previous<br />accounting period.</td>
+        <td colspan="3" class="shaded fw-bold">Credit</td>
+        <td class="heavy-left heavy-bottom heavy-right heavy-top">@(Period.PreviousCreditDebit > 0 ? FormatTime(Period.PreviousCreditDebit) : "")</td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td colspan="3" class="shaded fw-bold">Debit</td>
+        <td class="heavy-left heavy-bottom heavy-right heavy-top">@(Period.PreviousCreditDebit < 0 ? FormatTime(-Period.PreviousCreditDebit) : "")</td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
+    </tr>
+    <tr class="tiny">
+        <td colspan="18" class="shaded heavy-left">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="shaded heavy-left">&nbsp;</td>    
+        <td class="heavy-left heavy-top">Date</td>
+        <td class="heavy-left heavy-top">Day</td>
+        <td class="heavy-left heavy-top">Arrive</td>
+        <td class="heavy-left heavy-top">Depart</td>
+        <td class="heavy-left heavy-top">Total</td>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td class="heavy-left heavy-top">Arrive</td>
+        <td class="heavy-left heavy-top">Depart</td>
+        <td class="heavy-left heavy-top">Total</td>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td class="heavy-left heavy-top">Reason</td>
+        <td class="heavy-left heavy-top">Credit Time</td>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td class="heavy-left heavy-top">Daily Total</td>
+        <td class="heavy-left heavy-top">Cum. Total</td>
+        <td class="heavy-left heavy-top">Cond. Hours</td>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td class="heavy-left heavy-top">Daily / Weekly<br />Credit / Debit</td>
+        <td class="heavy-left heavy-top">Cum<br />Credit / Debit</td>
+        <td class="heavy-left shaded">&nbsp;</td>
+        <td class="heavy-left heavy-top">Daily Total Decimal</td>
+        <td class="heavy-left heavy-right shaded">&nbsp;</td>
+    </tr>
+    <Week @bind-Item="Period.Week1" WeekNumber="1" PreviousCreditDebit="Period.PreviousCreditDebit"></Week>
+    <Week @bind-Item="Period.Week2" WeekNumber="2" PreviousCreditDebit="Period.Week1.Sunday.CumulativeTotal"></Week>
+    <Week @bind-Item="Period.Week3" WeekNumber="3" PreviousCreditDebit="Period.Week2.Sunday.CumulativeTotal"></Week>
+    <Week @bind-Item="Period.Week4" WeekNumber="4" PreviousCreditDebit="Period.Week3.Sunday.CumulativeTotal"></Week>
+    <tr>
+        <td rowspan="4">&nbsp;</td>
+        <td rowspan="4" colspan="7">
+            <strong>
+                I confirm that the appropriate entries have been
+                made in the Credit time column in respect of all
+                absences during the period
+            </strong>
+        </td>
+        <td rowspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="6"><strong>Cumulative total of 4 weeks</strong></td>
+        <td>@FormatTime(Period.Week4.CumaltiveTotal)</td>
+        <td colspan="2">&nbsp;</td>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="6"><strong>Cond. hours for 4 weeks</strong></td>
+        <td>@FormatTime(148)</td>
+        <td colspan="2">&nbsp;</td>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="3"><strong>C/F to next</strong></td>
+        <td colspan="3"><strong>Credit:</strong></td>
+        <td>@(Period.NextCreditDebit > 0 ? FormatTime(Period.NextCreditDebit) : "")</td>
+        <td colspan="2">&nbsp;</td>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="3"><strong>acc. period</strong></td>
+        <td colspan="3"><strong>Debit:</strong></td>
+        <td>@(Period.NextCreditDebit < 0 ? FormatTime(Period.NextCreditDebit) : "")</td>
+        <td colspan="2">&nbsp;</td>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="18">&nbsp;</td>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+</table>
+
+@code {
+    public string DateText { get; set; } = String.Empty;
+
+    public PeriodRecord Period {get; set;} = new(new DateOnly(2024, 3, 25));
+
+    private string FormatTime(decimal d) => $"{Math.Floor(d)}:{(int)((d % 1) * 100):d2}";
+}
