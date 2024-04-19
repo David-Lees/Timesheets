@@ -103,7 +103,7 @@ code {
 }
 
 .shaded {
-    background-color: #F2F2F2;
+    background-color: #E0E0E0;
 }
 
 .bordered {
@@ -134,6 +134,14 @@ code {
     font-size: 6px;
 }
 
-input {
-    border: none;
+td:has(input){
+    width: 5.5ch;
 }
+
+td input {
+    border: none;
+    width: 5ch;
+    padding: 0 !important;
+    margin: 0
+}
+

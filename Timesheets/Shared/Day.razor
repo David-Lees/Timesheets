@@ -2,29 +2,29 @@
 @if (Item is not null)
 {
     <tr>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass">@Item.Date.ToShortDateString()</td>
-        <td class="bordered fw-bold @CssClass">@Item.Date.ToString("ddd")</td>
-        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.Start1Text" /></td>
-        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.End1Text" /></td>
-        <td class="bordered @CssClass">@GetAmTotal()</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.Start2Text" @bind-Value:after="TextChanged" /></td>
-        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.End2Text" @bind-Value:after="TextChanged" /></td>
-        <td class="bordered @CssClass">@GetPmTotal()</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass"><InputText type="text" @bind-Value="Item.Reason" @bind-Value:after="TextChanged" /></td>
-        <td class="bordered @CssClass"><InputText type="time" @bind-Value="Item.OtherText" @bind-Value:after="TextChanged" /></td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass">@FormatTime(Item.DailyTotal)</td>
-        <td class="bordered @CssClass">@FormatTime(Item.CumulativeTotal)</td>
-        <td class="bordered @CssClass">@FormatTime(Item.ConditionedHours)</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass">@FormatTime(Item.DailyTotal - Item.ConditionedHours)</td>
-        <td class="bordered @CssClass">@FormatTime(Item.CumulativeTotal)</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-        <td class="bordered @CssClass">@Item.DailyTotal.ToString("f2")</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 10ch">@Item.Date.ToShortDateString()</td>
+        <td class="bordered text-center fw-bold @CssClass" style="width: 5ch">@Item.Date.ToString("ddd")</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.Start1Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.End1Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@GetAmTotal()</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.Start2Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.End2Text" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@GetPmTotal()</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.Reason" @bind-Value:after="TextChanged" /></td>
+        <td class="bordered text-center @CssClass" style="width: 7ch"><InputText @bind-Value="Item.OtherText" @bind-Value:after="TextChanged" /></td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@FormatTime(Item.DailyTotal)</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@FormatTime(Item.CumulativeTotal)</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@FormatTime(Item.ConditionedHours)</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@FormatTime(Item.DailyTotal - Item.ConditionedHours)</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@FormatTime(Item.CumulativeTotal)</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
+        <td class="bordered text-center @CssClass" style="width: 7ch">@Item.DailyTotal.ToString("f2")</td>
+        <td class="shaded heavy-left heavy-right" style="width: 2ch">&nbsp;</td>
     </tr>
 }
 

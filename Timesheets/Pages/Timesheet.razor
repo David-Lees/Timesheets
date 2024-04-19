@@ -11,10 +11,12 @@
     <tr>
         <td colspan="5" rowspan="3" class="heavy-bottom"><h3>Timesheet</h3></td>
         <td class="shaded heavy-left">&nbsp;</td>
-        <td colspan="3" class="shaded fw-bold">Start Date</td>
-        <td class="heavy-left heavy-bottom heavy-right heavy-top"><InputText type="date" @bind-Value="DateText" /></td>
-        <td colspan="2" class="shaded">&nbsp;</td>
-        <td colspan="4" class="shaded fw-bold">Return for 4 week period ending</td>
+        <td colspan="2" class="shaded fw-bold">Start Date</td>
+        <td colspan="2" class="heavy-left heavy-bottom heavy-right heavy-top">
+            @Period.StartDate.ToShortDateString()
+        </td>
+        <td class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded fw-bold">Return for 4 week period ending</td>
         <td class="shaded fw-bold">@Period.StartDate.AddDays(28).ToShortDateString()</td>
         <td class="shaded heavy-right">&nbsp;</td>
         <td class="shaded heavy-right" colspan="5">&nbsp;</td>
@@ -39,28 +41,28 @@
         <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
     </tr>
     <tr>
-        <td class="shaded heavy-left">&nbsp;</td>    
-        <td class="heavy-left heavy-top">Date</td>
-        <td class="heavy-left heavy-top">Day</td>
-        <td class="heavy-left heavy-top">Arrive</td>
-        <td class="heavy-left heavy-top">Depart</td>
-        <td class="heavy-left heavy-top">Total</td>
+        <td class="shaded heavy-left">&nbsp;</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Date</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Day</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Arrive</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Depart</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Total</td>
         <td class="heavy-left shaded">&nbsp;</td>
-        <td class="heavy-left heavy-top">Arrive</td>
-        <td class="heavy-left heavy-top">Depart</td>
-        <td class="heavy-left heavy-top">Total</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Arrive</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Depart</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Total</td>
         <td class="heavy-left shaded">&nbsp;</td>
-        <td class="heavy-left heavy-top">Reason</td>
-        <td class="heavy-left heavy-top">Credit Time</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Reason</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Credit Time</td>
         <td class="heavy-left shaded">&nbsp;</td>
-        <td class="heavy-left heavy-top">Daily Total</td>
-        <td class="heavy-left heavy-top">Cum. Total</td>
-        <td class="heavy-left heavy-top">Cond. Hours</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Daily Total</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Cum. Total</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Cond. Hours</td>
         <td class="heavy-left shaded">&nbsp;</td>
-        <td class="heavy-left heavy-top">Daily / Weekly<br />Credit / Debit</td>
-        <td class="heavy-left heavy-top">Cum<br />Credit / Debit</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Daily/Weekly<br />Credit/Debit</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Cumulative<br />Credit/Debit</td>
         <td class="heavy-left shaded">&nbsp;</td>
-        <td class="heavy-left heavy-top">Daily Total Decimal</td>
+        <td class="heavy-left heavy-top fw-bold text-center">Daily Total Decimal</td>
         <td class="heavy-left heavy-right shaded">&nbsp;</td>
     </tr>
     <Week @bind-Item="Period.Week1" WeekNumber="1" PreviousCreditDebit="Period.PreviousCreditDebit"></Week>
@@ -68,52 +70,50 @@
     <Week @bind-Item="Period.Week3" WeekNumber="3" PreviousCreditDebit="Period.Week2.Sunday.CumulativeTotal"></Week>
     <Week @bind-Item="Period.Week4" WeekNumber="4" PreviousCreditDebit="Period.Week3.Sunday.CumulativeTotal"></Week>
     <tr>
-        <td rowspan="4">&nbsp;</td>
-        <td rowspan="4" colspan="7">
-            <strong>
-                I confirm that the appropriate entries have been
-                made in the Credit time column in respect of all
-                absences during the period
-            </strong>
+        <td rowspan="4" class="shaded heavy-left">&nbsp;</td>
+        <td rowspan="4" colspan="7" class="shaded fw-bold">
+            I confirm that the appropriate entries have been
+            made in the Credit time column in respect of all
+            absences during the period.
         </td>
-        <td rowspan="4">&nbsp;</td>
+        <td rowspan="4" class="shaded">&nbsp;</td>
+        <td colspan="6" class="shaded"><strong>Cumulative total of 4 weeks</strong></td>
+        <td class="heavy-left heavy-right heavy-bottom heavy-top text-center">@FormatTime(Period.Week4.CumaltiveTotal)</td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="6"><strong>Cumulative total of 4 weeks</strong></td>
-        <td>@FormatTime(Period.Week4.CumaltiveTotal)</td>
-        <td colspan="2">&nbsp;</td>
-        <td colspan="5">&nbsp;</td>
+        <td colspan="6" class="shaded"><strong>Cond. hours for 4 weeks</strong></td>
+        <td class="heavy-left heavy-right heavy-bottom heavy-top text-center">@FormatTime(148)</td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="6"><strong>Cond. hours for 4 weeks</strong></td>
-        <td>@FormatTime(148)</td>
-        <td colspan="2">&nbsp;</td>
-        <td colspan="5">&nbsp;</td>
+        <td colspan="3" class="shaded"><strong>C/F to next</strong></td>
+        <td colspan="3" class="shaded"><strong>Credit:</strong></td>
+        <td class="heavy-left heavy-right heavy-bottom heavy-top text-center">
+            @(Period.NextCreditDebit > 0 ? FormatTime(Period.NextCreditDebit) : "")
+        </td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="3"><strong>C/F to next</strong></td>
-        <td colspan="3"><strong>Credit:</strong></td>
-        <td>@(Period.NextCreditDebit > 0 ? FormatTime(Period.NextCreditDebit) : "")</td>
-        <td colspan="2">&nbsp;</td>
-        <td colspan="5">&nbsp;</td>
+        <td colspan="3" class="shaded"><strong>acc. period</strong></td>
+        <td colspan="3" class="shaded"><strong>Debit:</strong></td>
+        <td class="heavy-left heavy-right heavy-bottom heavy-top text-center">
+            @(Period.NextCreditDebit < 0 ? FormatTime(Period.NextCreditDebit) : "")
+        </td>
+        <td colspan="2" class="shaded">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="3"><strong>acc. period</strong></td>
-        <td colspan="3"><strong>Debit:</strong></td>
-        <td>@(Period.NextCreditDebit < 0 ? FormatTime(Period.NextCreditDebit) : "")</td>
-        <td colspan="2">&nbsp;</td>
-        <td colspan="5">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="18">&nbsp;</td>
-        <td colspan="5">&nbsp;</td>
+        <td colspan="18" class="shaded heavy-left heavy-right heavy-bottom">&nbsp;</td>
+        <td colspan="5" class="shaded heavy-left heavy-right heavy-bottom">&nbsp;</td>
     </tr>
 </table>
 
 @code {
-    public string DateText { get; set; } = String.Empty;
-
-    public PeriodRecord Period {get; set;} = new(new DateOnly(2024, 3, 25));
+    public PeriodRecord Period { get; set; } = new(new DateOnly(2024, 3, 25));
 
     private string FormatTime(decimal d) => $"{Math.Floor(d)}:{(int)((d % 1) * 100):d2}";
 }
