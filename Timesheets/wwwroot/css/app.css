@@ -145,3 +145,10 @@ td input {
     margin: 0
 }
 
+.holiday {
+    background-color: darkgoldenrod;
+}
+
+.in-office {
+    background-color: burlywood;
+}

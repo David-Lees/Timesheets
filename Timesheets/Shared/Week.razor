@@ -1,25 +1,16 @@
 ﻿@using Timesheets.Models
-<Day @bind-Item="Item.Monday"></Day>
-<Day @bind-Item="Item.Tuesday"></Day>
-<Day @bind-Item="Item.Wednesday"></Day>
-<Day @bind-Item="Item.Thursday"></Day>
-<Day @bind-Item="Item.Friday"></Day>
-<Day @bind-Item="Item.Saturday"></Day>
-<Day @bind-Item="Item.Sunday"></Day>
+<Day @bind-Item="Item.Monday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Tuesday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Wednesday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Thursday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Friday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Saturday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
+<Day @bind-Item="Item.Sunday" @bind-Item:after="() => ItemChanged.InvokeAsync(Item)"></Day>
 <tr>
-    <td colspan="14" class="text-end shaded heavy-left heavy-right p-2">@TotalLabel</td>
-    <td class="heavy-bottom heavy-left heavy-right heavy-top">@FormatTime(Item.WeekTotal)</td>
-    <td>@FormatTime(Item.CumaltiveTotal)</td>
-    @if (WeekNumber == 1)
-    {
-        <td class="bordered text-center">@FormatTime(Item.CumaltiveTotal + PreviousCreditDebit)</td>
-        <td class="shaded heavy-left heavy-right">&nbsp;</td>
-    }
-    else
-    {
-        <td colspan="2" class="shaded heavy-left heavy-right">&nbsp;</td>
-    }
-    <td class="bordered text-center heavy-bottom">@FormatTime(Item.CumaltiveTotal)</td>
+    <td colspan="17" class="text-end shaded heavy-left heavy-right p-2">@TotalLabel</td>
+    <td class="heavy-bottom heavy-left heavy-right heavy-top text-center">@TimeHelper.FormatTime(Item.WeekTotal)</td>
+    <td class="shaded heavy-left heavy-right">&nbsp;</td>
+    <td class="bordered text-center heavy-bottom text-center">@TimeHelper.FormatTime(Item.WeekTotal)</td>
     <td class="shaded heavy-left heavy-top">&nbsp;</td>
     <td class="shaded">&nbsp;</td>
     <td class="heavy-top heavy-left heavy-right text-center heavy-bottom">@Item.WeekTotal.ToString("f2")</td>
@@ -47,6 +38,4 @@
         4 => "4th Week total",
         _ => "ERROR!"
     };
-
-    private string FormatTime(decimal d) => $"{Math.Floor(d)}:{(int)((d % 1) * 100):d2}";
 }
