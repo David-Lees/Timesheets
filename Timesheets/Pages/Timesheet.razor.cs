@@ -1,67 +1,62 @@
-using Azure.Identity;
-using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Components;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using System.Globalization;
-using System.Text;
-using System.Text.Json;
+using System.Net.Http.Json;
 using Timesheets.Models;
 
 namespace Timesheets.Pages;
 
 public partial class Timesheet
 {
+    private HttpClient? _http;
+
     [Inject]
     public IConfiguration Config { get; set; } = default!;
+
+    [Inject]
+    public IAccessTokenProviderAccessor Accessor { get; set; } = default!;
+
+    [Inject]
+    public IHttpClientFactory HttpClientFactory { get; set; } = default!;
 
     [Parameter]
     public string StartDate { get; set; } = string.Empty;
 
     private DateOnly _startDate;
-    private BlobServiceClient? _client;
-    private BlobContainerClient? _container;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        Update();
+        _http = HttpClientFactory.CreateClient("api");
+        await LoadSheet();
+        await Update();
     }
 
     public async Task<PeriodRecord?> LoadFile(DateOnly date)
     {
-        if (_container is null) return null;
-        var file = _container.GetBlobClient(date.ToString("yyyy-MM-dd") + ".json");
-        using Stream stream = await file
-           .OpenReadAsync()
-           .ConfigureAwait(false);
+        if (_http is null) return null;
 
-        return await JsonSerializer.DeserializeAsync<PeriodRecord>(stream).ConfigureAwait(false);
+        var response = _http.GetAsync($"/api/LoadFile?file={date.ToString("yyyy-MM-dd") + ".json"}");
+        if (response == null || !response.IsCompletedSuccessfully) return null;
+
+        return await response.Result.Content.ReadFromJsonAsync<PeriodRecord>();
     }
 
     public async Task SaveFile()
     {
-        if (_container is null) return;
-        var file = _container.GetBlobClient(_startDate.ToString("yyyy-MM-dd") + ".json");
-        using MemoryStream ms = new();
-        await JsonSerializer.SerializeAsync(ms, Period);
-        ms.Position = 0;
-        await file.UploadAsync(ms);
+        if (_http is null) return;
+        await _http.PostAsJsonAsync($"/api/SaveFile?file={_startDate.ToString("yyyy-MM-dd") + ".json"}", Period);
     }
 
     public async Task LoadSheet()
     {
-        var accountUri = new Uri(Config.GetValue<string>("BlobStorage")!);
-        _client = new BlobServiceClient(accountUri, new DefaultAzureCredential());
         _startDate = DateOnly.ParseExact(StartDate, "yyyy-MM-dd", new CultureInfo("en-GB"));
-        _container = _client.GetBlobContainerClient("timesheets");
 
         Period = await LoadFile(_startDate);
         Period ??= new PeriodRecord(_startDate);
 
-        if (_startDate == new DateOnly(2024, 1,1))
+        if (_startDate == new DateOnly(2024, 1, 1))
         {
-            Period.PreviousCreditDebit = 0; // TODO: start time here
+            Period.PreviousCreditDebit = -18.95M;
         }
         else
         {
@@ -72,7 +67,7 @@ public partial class Timesheet
 
     public PeriodRecord? Period { get; set; }
 
-    public void Update()
+    public async Task Update()
     {
         if (Period is null) return;
         Console.WriteLine("Update in Timesheet called");
@@ -106,6 +101,7 @@ public partial class Timesheet
         Period.Week4.Sunday.CumulativeTotal = Period.Week4.Saturday.CumulativeTotal + Period.Week4.Sunday.CumulativeHours;
 
         Period.NextCreditDebit = Period.Week4.Sunday.CumulativeTotal;
-    }
 
+        await SaveFile();
+    }
 }

@@ -2,10 +2,25 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Timesheets</h1>
 
-<div class="alert alert-warning" role="alert">
-    Before authentication will function correctly, you must configure your provider details in <code>Program.cs</code>
-</div>
+<table class="table">
+    @foreach (var year in dates)
+    {
+        <tr>
+            @foreach(var d in year)
+            {
+                <td class="@GetCssClass(d)"><a href="/timesheet/@d.ToString("yyyy-MM-dd")">@d.ToString("dd/MM/yyyy")</a></td>
+            }
+        </tr>
+    }
+</table>
 
-Welcome to your new app.
+@code {
+    public string GetCssClass(DateOnly d)
+    {
+        var now = DateOnly.FromDateTime(DateTime.UtcNow);
+        if (d <= now && d.AddDays(28) >= now) return "yellow";
+        return string.Empty;
+    }
+}

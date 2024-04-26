@@ -134,7 +134,7 @@ code {
     font-size: 6px;
 }
 
-td:has(input){
+td:has(input) {
     width: 5.5ch;
 }
 
@@ -151,4 +151,8 @@ td input {
 
 .in-office {
     background-color: burlywood;
+}
+
+.yellow {
+    background-color: yellow;
 }

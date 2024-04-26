@@ -3,6 +3,8 @@
 @using Timesheets.Models
 @using Timesheets.Shared
 
+@if (Period is not null)
+{
 <table class="table">
     <tr class="tiny">
         <td colspan="5">&nbsp;</td>
@@ -118,6 +120,7 @@
     </tr>
 </table>
 
-<pre>
+<pre style="display: none;">
     @JsonSerializer.Serialize(Period, new JsonSerializerOptions { WriteIndented = true })
 </pre>
+}
