@@ -15,8 +15,11 @@ var apiUrl = builder.Configuration.GetValue<string>("ApiUrl") ?? string.Empty;
 builder.Services.AddScoped<WebApiAuthorizationMessageHandler>();
 
 // Http Client for communicating with API
-builder.Services.AddHttpClient("api", client => client.BaseAddress = new Uri(apiUrl))
-    .AddHttpMessageHandler<WebApiAuthorizationMessageHandler>();
+builder.Services.AddHttpClient("api", client =>
+{
+    client.BaseAddress = new Uri(apiUrl);
+    client.DefaultRequestHeaders.Add("x-functions-key", builder.Configuration.GetValue<string>("FunctionKey"));
+}).AddHttpMessageHandler<WebApiAuthorizationMessageHandler>();
 
 builder.Services.AddMsalAuthentication(options =>
 {
