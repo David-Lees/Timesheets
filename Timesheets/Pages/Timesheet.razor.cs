@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using System.Globalization;
 using System.Net.Http.Json;
@@ -6,9 +7,12 @@ using Timesheets.Models;
 
 namespace Timesheets.Pages;
 
-public partial class Timesheet
+public partial class Timesheet: IDisposable
 {
     private HttpClient? _http;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
     public IConfiguration Config { get; set; } = default!;
@@ -24,27 +28,55 @@ public partial class Timesheet
 
     private DateOnly _startDate;
 
+    private IDisposable? registration;
+    private bool disposedValue;
+    private bool unsaved = false;
+    private bool loaded = false;
+
+    private ValueTask LocationChangingHandler(LocationChangingContext arg)
+    {
+        Console.WriteLine("Location is changing...");
+
+        if (unsaved)
+            arg.PreventNavigation();
+
+        return ValueTask.CompletedTask;
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            registration = NavigationManager.RegisterLocationChangingHandler(LocationChangingHandler);
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         _http = HttpClientFactory.CreateClient("api");
         await LoadSheet();
-        await Update();
+        Update();
+        StateHasChanged();
     }
 
     public async Task<PeriodRecord?> LoadFile(DateOnly date)
     {
         if (_http is null) return null;
 
-        var response = _http.GetAsync($"/api/LoadFile?file={date.ToString("yyyy-MM-dd") + ".json"}");
-        if (response == null || !response.IsCompletedSuccessfully) return null;
+        var response = await _http.GetAsync
+            ($"/api/LoadFile?file={date.ToString("yyyy-MM-dd") + ".json"}&r={DateTime.Now.Ticks}") ?? throw new NotImplementedException("response is null");
 
-        return await response.Result.Content.ReadFromJsonAsync<PeriodRecord>();
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<PeriodRecord>();
     }
 
     public async Task SaveFile()
     {
         if (_http is null) return;
         await _http.PostAsJsonAsync($"/api/SaveFile?file={_startDate.ToString("yyyy-MM-dd") + ".json"}", Period);
+        unsaved = false;
     }
 
     public async Task LoadSheet()
@@ -52,7 +84,7 @@ public partial class Timesheet
         _startDate = DateOnly.ParseExact(StartDate, "yyyy-MM-dd", new CultureInfo("en-GB"));
 
         Period = await LoadFile(_startDate);
-        Period ??= new PeriodRecord(_startDate);
+        if (Period is null) throw new NotImplementedException("Unable to load period");
 
         if (_startDate == new DateOnly(2024, 1, 1))
         {
@@ -63,11 +95,13 @@ public partial class Timesheet
             var previous = await LoadFile(_startDate.AddDays(28)) ?? new();
             Period.PreviousCreditDebit += previous.NextCreditDebit;
         }
+
+        loaded = true;
     }
 
     public PeriodRecord? Period { get; set; }
 
-    public async Task Update()
+    public void Update()
     {
         if (Period is null) return;
         Console.WriteLine("Update in Timesheet called");
@@ -101,7 +135,26 @@ public partial class Timesheet
         Period.Week4.Sunday.CumulativeTotal = Period.Week4.Saturday.CumulativeTotal + Period.Week4.Sunday.CumulativeHours;
 
         Period.NextCreditDebit = Period.Week4.Sunday.CumulativeTotal;
+        unsaved = true;
+    }
 
-        await SaveFile();
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                registration?.Dispose();
+            }
+
+            disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

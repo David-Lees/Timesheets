@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using System.Net.Http;
 using Timesheets;
 using Timesheets.Models;
 
