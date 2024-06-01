@@ -1,3 +1,4 @@
+using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Timesheets;
@@ -12,6 +13,9 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 var apiUrl = builder.Configuration.GetValue<string>("ApiUrl") ?? string.Empty;
 
 builder.Services.AddScoped<WebApiAuthorizationMessageHandler>();
+builder.Services.AddHxServices();
+builder.Services.AddHxMessenger();
+builder.Services.AddHxMessageBoxHost();
 
 // Http Client for communicating with API
 builder.Services.AddHttpClient("api", client =>

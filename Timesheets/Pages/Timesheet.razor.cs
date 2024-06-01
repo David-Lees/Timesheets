@@ -1,3 +1,5 @@
+using Havit.Blazor.Components.Web;
+using Havit.Blazor.Components.Web.Bootstrap;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
@@ -7,7 +9,7 @@ using Timesheets.Models;
 
 namespace Timesheets.Pages;
 
-public partial class Timesheet: IDisposable
+public partial class Timesheet : IDisposable
 {
     private HttpClient? _http;
 
@@ -25,6 +27,9 @@ public partial class Timesheet: IDisposable
 
     [Parameter]
     public string StartDate { get; set; } = string.Empty;
+
+    [Inject]
+    protected IHxMessengerService Messenger { get; set; } = default!;
 
     private DateOnly _startDate;
 
@@ -55,7 +60,15 @@ public partial class Timesheet: IDisposable
     protected override async Task OnInitializedAsync()
     {
         _http = HttpClientFactory.CreateClient("api");
-        await LoadSheet();
+        try
+        {
+            await LoadSheet();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
+        }
         Update();
         StateHasChanged();
     }
@@ -67,7 +80,7 @@ public partial class Timesheet: IDisposable
         var response = await _http.GetAsync
             ($"/api/LoadFile?file={date.ToString("yyyy-MM-dd") + ".json"}&r={DateTime.Now.Ticks}") ?? throw new NotImplementedException("response is null");
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode) return null;
 
         return await response.Content.ReadFromJsonAsync<PeriodRecord>();
     }
@@ -75,16 +88,23 @@ public partial class Timesheet: IDisposable
     public async Task SaveFile()
     {
         if (_http is null) return;
-        await _http.PostAsJsonAsync($"/api/SaveFile?file={_startDate.ToString("yyyy-MM-dd") + ".json"}", Period);
-        unsaved = false;
+        var response = await _http.PostAsJsonAsync($"/api/SaveFile?file={_startDate.ToString("yyyy-MM-dd") + ".json"}", Period);
+        if (response.IsSuccessStatusCode)
+        {
+            unsaved = false;
+            Messenger.AddInformation("Saved", "The timesheet has been saved");
+        }
+        else
+        {
+            Messenger.AddError("Error", "Unable to save timesheet");
+        }
     }
 
     public async Task LoadSheet()
     {
         _startDate = DateOnly.ParseExact(StartDate, "yyyy-MM-dd", new CultureInfo("en-GB"));
 
-        Period = await LoadFile(_startDate);
-        if (Period is null) throw new NotImplementedException("Unable to load period");
+        Period = await LoadFile(_startDate) ?? new(_startDate);
 
         if (_startDate == new DateOnly(2024, 1, 1))
         {
@@ -92,8 +112,8 @@ public partial class Timesheet: IDisposable
         }
         else
         {
-            var previous = await LoadFile(_startDate.AddDays(28)) ?? new();
-            Period.PreviousCreditDebit += previous.NextCreditDebit;
+            var previous = await LoadFile(_startDate.AddDays(-28)) ?? new();
+            Period.PreviousCreditDebit = previous.NextCreditDebit;
         }
 
         loaded = true;

@@ -42,5 +42,5 @@ public class PeriodRecord
         Week3.HoursInOffice +
         Week4.HoursInOffice;
 
-    public decimal InOfficePercent => InOffice / ConditonedHoursLessHoliday * 100;
+    public decimal InOfficePercent => ConditonedHoursLessHoliday == 0 ? 0 : InOffice / ConditonedHoursLessHoliday * 100;
 }
