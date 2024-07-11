@@ -153,6 +153,6 @@ td input {
     background-color: burlywood;
 }
 
-.yellow {
+.yellow, .yellow a {
     background-color: yellow;
 }
