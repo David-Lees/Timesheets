@@ -1,0 +1,25 @@
+﻿<div class="align-content-center">
+    <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <p class="govuk-body-lead text-center">@Text</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Text { get; set; }
+}

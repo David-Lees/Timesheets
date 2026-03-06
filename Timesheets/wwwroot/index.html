@@ -14,6 +14,7 @@
     <link href="manifest.webmanifest" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <script type="importmap"></script>
 </head>
 
 <body>
@@ -27,7 +28,7 @@
 
     <noscript>
         <div class="govuk-width-container govuk-body">
-            <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main" aria-label="No JavaScript support">
+            <main class="govuk-main-wrapper govuk-main-wrapper--l" role="main" aria-label="No JavaScript support">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-full">
                         <h1 class="govuk-heading-l">Sorry, your web browser isn't capable of using this site</h1>
@@ -44,7 +45,7 @@
     </noscript>
     <div id="wasmMissing" style="display: none;">
         <div class="govuk-width-container govuk-body">
-            <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main" aria-label="No WebAssembly support">
+            <main class="govuk-main-wrapper govuk-main-wrapper--l" role="main" aria-label="No WebAssembly support">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-full">
                         <h1 class="govuk-heading-l">Sorry, your web browser isn't capable of using this site</h1>
@@ -67,7 +68,7 @@
     </div>
 
     <script type="text/javascript">
-        window.BlazorScrollToId = function (id) {
+        globalThis.BlazorScrollToId = function (id) {
             const element = document.getElementById(id);
             if (element instanceof HTMLElement) {
                 element.scrollIntoView({
@@ -78,12 +79,12 @@
             }
         }
 
-        window.BlazorScrollToTop = function () {
+        globalThis.BlazorScrollToTop = function () {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.BlazorGoBack = function () {
-            window.history.back();
+        globalThis.BlazorGoBack = function () {
+            globalThis.history.back();
         }
 
         const debounce = (fn) => {
@@ -112,22 +113,22 @@
         document.addEventListener('scroll', debounce(storeScroll), { passive: true });
         storeScroll();
 
-        window.GetClientWidth = (elem) => {
+        globalThis.GetClientWidth = (elem) => {
             console.log('Getting width of element', elem, elem.clientWidth);
             return elem.clientWidth || 0;
         }
-        window.GetClientHeight = (elem) => {
+        globalThis.GetClientHeight = (elem) => {
             console.log('Getting height of element', elem, elem.clientHeight);
             return elem.clientHeight;
         }
 
-        window.Click = (id) => {
+        globalThis.Click = (id) => {
             document.getElementById(id).click();
         };
     </script>
 
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
     <script>
         //check if webassembly is supported
         const webassemblySupported = (function () {
@@ -142,20 +143,24 @@
                             instanceof WebAssembly.Instance;
                 }
             } catch (e) {
+                console.error(e);
             }
             return false;
         })();
 
         // Modern browsers e.g. Microsoft Edge
         if (webassemblySupported) {
-            Blazor.start({});
+            Blazor.start({
+                loadBootResource: function (type, name, defaultUri, integrity) {
+                    return defaultUri;
+                }
+            });
         }
         // Older browsers e.g. IE11
         else {
             document.getElementById("wasmMissing").style.display = "block";
         }
     </script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

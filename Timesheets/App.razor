@@ -2,6 +2,14 @@
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <div class="govuk-width-container">
+                        <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
+                            <h1>Signing in</h1>
+                            <Spinner Text="Authorising..." />
+                        </main>
+                    </div>
+                </Authorizing>
                 <NotAuthorized>
                     @if (context.User.Identity?.IsAuthenticated != true)
                     {
